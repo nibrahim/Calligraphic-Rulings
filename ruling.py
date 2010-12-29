@@ -8,22 +8,23 @@ from reportlab.lib.pagesizes import A4
 
 
 
-def draw_ruling(canvas):
-    for i in range(0,150,2):
-        canvas.rect(1*mm, i*2*mm, 3*mm, 2*mm, stroke = 1, fill = 1)
-        canvas.rect(4*mm, (i+1)*2*mm, 3*mm, 2*mm, stroke = 1, fill = 1)
-        
+def draw_ruling(canvas, nw):
+    for i in range(0, int(300/nw)):
+        if i%2 == 0:
+            canvas.rect(1*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+        else:
+            canvas.rect(3*mm, i*nw*mm ,2*mm, nw*mm, stroke = 0, fill = 1)
         
 
 def main(opts, args):
-    c = canvas.Canvas(args[0], bottomup = 1, pagesize = A4, cropMarks = True)
-    draw_ruling(c)
+    c = canvas.Canvas(args[1], bottomup = 1, pagesize = A4, cropMarks = True)
+    draw_ruling(c, opts.nib_width)
     c.showPage()
     c.save()
 
 def parse_options(args):
     parser = optparse.OptionParser()
-    parser.add_option("-n","--nib-width", dest = "nib_width",
+    parser.add_option("-n","--nib-width", dest = "nib_width", type=float,
                       help = "Width of the nib specified in millimeters. All other measurements are multiples of this.")
     return parser.parse_args(args)
 
