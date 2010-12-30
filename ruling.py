@@ -6,7 +6,7 @@ from reportlab.pdfgen import canvas, textobject, pdfimages
 from reportlab.lib.units import mm
 from reportlab.lib.pagesizes import A4
 
-
+__VERSION__ = "0.1alpha"
 
 def draw_width_markers(canvas, nw):
     for i in range(0, int(300/nw)):
@@ -16,6 +16,8 @@ def draw_width_markers(canvas, nw):
         else:
             canvas.rect(3*mm, i*nw*mm ,2*mm, nw*mm, stroke = 0, fill = 1)
             canvas.rect(A4[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+
+    
 
 def draw_single_line(canvas, position, nib_width, partitions):
     """Draws rulings for a single line of calligraphic text. Returns
@@ -33,25 +35,26 @@ def draw_ruling(canvas, nib_width, partitions, gap, nrulings, top_margin):
     "Draws lines and separators on the page"
     line_height = sum((float(x) for x in partitions.split(",")),0.0) # Sum of the ascenders, descenders and body
     line_height += gap # Add the gap
-    print "Line height ", line_height
-    print nrulings
+    canvas.rect(1*mm, 1*mm, A4[0], top_margin * mm * nib_width, stroke = 0, fill = 1)
     for i in range(nrulings):
         position = (top_margin * mm * nib_width) + (i * line_height * nib_width * mm) # Margin + position for the current line
         offset = draw_single_line(canvas, position, nib_width, partitions)
         canvas.rect(1*mm, offset, A4[0], gap * nib_width * mm, stroke = 0, fill = 1)
-    # idx = 0
-    # segments = [float(x) for x in partitions.split(",")]
-    # segments.append(gap)
-    # for i in range(0, 5): #int(300/nw)):
-    #     for j in segments:
-    #         canvas.line(1*mm, segno + i*j*nw*mm, A4[0], segno + i*j*nw*mm)
-    #         segno += i*j*mm*nw
         
+def write_title(canvas, text, partitions):
+    canvas.setFillColorRGB(0.7,0.7,0.7)
+    canvas.setFont("Times-Italic", 30)
+    canvas.setTitle(text)
+    canvas.rotate(90)
+    canvas.drawString(20*mm, 0 ,"%s (%s)"%(text,partitions))
 
 def main(opts, args):
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = A4, cropMarks = True)
+    c.setAuthor("ruling.py version %s"%__VERSION__)
     draw_width_markers(c, opts.nib_width)
     draw_ruling(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.tmargin)
+    if opts.title:
+        write_title(c, opts.title, opts.partitions)
     c.showPage()
     c.save()
 
@@ -62,10 +65,13 @@ def parse_options(args):
     parser.add_option("-p", "--partitions", dest = "partitions", type="string",
                       help = "comma separated list of partitions in each line (specified in nib widths)")
     parser.add_option("-g", "--gap", dest = "gap", type=float, help = "gap between lines (specified in nib widths)")
+    parser.add_option("--top-margin", dest = "tmargin", default = 2, type = int,
+                      help = "Top margin (specified in nib widths). Default is 2")
     parser.add_option("-r", "--rulings", dest = "rulings", default = 10, type=int,
-                      help = "How many rulings to draw")
-    parser.add_option("-t","--top-margin", dest = "tmargin", default = 2, type = int,
-                      help = "Top margin (specified in nib widths)")
+                      help = "How many rulings to draw. Default is 10")
+    parser.add_option("-t", "--title", dest = "title", type = "string",
+                      help = "A title for this ruling (usually the font name)")
+
     return parser.parse_args(args)
 
 if __name__ == "__main__":
