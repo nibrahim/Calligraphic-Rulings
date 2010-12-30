@@ -73,15 +73,15 @@ def write_title(canvas, text, partitions):
 def status_message(opts, args):
     "Prints a status message for the user"
     return """Ruling.py version %s
----------------------------
+------------------------------------------------------------
 Creating ruling sheet for '%s'
-Output file : %s
-Nib width : %smm
-Partitions per line (in nib widths) : %s
-Gap between lines (in nib widths) : %s
-Top margin : (in nib widths) : %s
+Output file                            : %s
+Nib width                              : %smm
+Partitions per line (in nib widths)    : %s
+Gap between lines (in nib widths)      : %s
+Top margin : (in nib widths)           : %s
 Angle markings for angles (in degrees) : %s
----------------------------"""%(__VERSION__, opts.title or "untitled", args[1], opts.nib_width,
+------------------------------------------------------------"""%(__VERSION__, opts.title or "untitled", args[1], opts.nib_width,
 opts.partitions, opts.gap, opts.top_margin, opts.angles or "No angle markings")
 
 def main(opts, args):
