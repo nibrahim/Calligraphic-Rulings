@@ -52,7 +52,12 @@ def draw_ruling(canvas, nib_width, partitions, gap, nrulings, top_margin):
 
 def draw_lines_for_angle(canvas, angle):
     "Draws a few lines for the given angle"
-    for i in range(-200, 500, 20):
+    for i in range(0, 500, 20):
+        x0, y0 = i*mm, 0
+        x1, y1 = compute_endpoint(x0, y0, angle)
+        canvas.line(x0, y0, x1, y1)
+
+    for i in range(0, 500, 20):
         x0, y0 = 0, i*mm
         x1, y1 = compute_endpoint(x0, y0, angle)
         canvas.line(x0, y0, x1, y1)
