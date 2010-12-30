@@ -20,6 +20,7 @@ def compute_endpoint(x0, y0, angle):
 
 # Functions to draw different things on the canvas
 def draw_width_markers(canvas, nw):
+    "Draws markers on the right and left indicating pen nib widths"
     for i in range(0, int(300/nw)):
         if i%2 == 0:
             canvas.rect(1*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
@@ -28,12 +29,9 @@ def draw_width_markers(canvas, nw):
             canvas.rect(3*mm, i*nw*mm ,2*mm, nw*mm, stroke = 0, fill = 1)
             canvas.rect(A4[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
 
-    
-
 def draw_single_line(canvas, position, nib_width, partitions):
     """Draws rulings for a single line of calligraphic text. Returns
     position of last line drawn"""
-    print "Drawing at %s"%position
     offset = position
     canvas.line(1*mm, offset, A4[0], offset)
     for i in (float(x) for x in partitions.split(",")):
@@ -61,7 +59,6 @@ def draw_lines_for_angle(canvas, angle):
 
 def draw_angle_lines(canvas, angles):
     "Draws oblique lines to help with pen positioning and serifs"
-    print "Drawing angles"
     angles = (float(x.strip()) for x in angles.split(","))
     for i in angles:
         draw_lines_for_angle(canvas, i)
@@ -73,11 +70,26 @@ def write_title(canvas, text, partitions):
     canvas.rotate(90)
     canvas.drawString(20*mm, 0 ,"%s (%s)"%(text,partitions))
 
+def status_message(opts, args):
+    "Prints a status message for the user"
+    return """Ruling.py version %s
+---------------------------
+Creating ruling sheet for '%s'
+Output file : %s
+Nib width : %smm
+Partitions per line (in nib widths) : %s
+Gap between lines (in nib widths) : %s
+Top margin : (in nib widths) : %s
+Angle markings for angles (in degrees) : %s
+---------------------------"""%(__VERSION__, opts.title or "untitled", args[1], opts.nib_width,
+opts.partitions, opts.gap, opts.top_margin, opts.angles or "No angle markings")
+
 def main(opts, args):
+    print status_message(opts, args)
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = A4, cropMarks = True)
     c.setAuthor("ruling.py version %s"%__VERSION__)
     draw_width_markers(c, opts.nib_width)
-    draw_ruling(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.tmargin)
+    draw_ruling(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
     if opts.angles:
         draw_angle_lines(c, opts.angles)
     if opts.title:
@@ -90,9 +102,9 @@ def parse_options(args):
     parser.add_option("-n", "--nib-width", dest = "nib_width", type=float,
                       help = "Width of the nib specified in millimeters. All other measurements are multiples of this.")
     parser.add_option("-p", "--partitions", dest = "partitions", type="string",
-                      help = "comma separated list of partitions in each line (specified in nib widths)")
+                      help = "Comma separated list of partitions in each line (specified in nib widths)")
     parser.add_option("-g", "--gap", dest = "gap", type=float, help = "gap between lines (specified in nib widths)")
-    parser.add_option("--top-margin", dest = "tmargin", default = 2, type = int,
+    parser.add_option("--top-margin", dest = "top_margin", default = 2, type = int,
                       help = "Top margin (specified in nib widths). Default is 2")
     parser.add_option("-r", "--rulings", dest = "rulings", default = 10, type=int,
                       help = "How many rulings to draw. Default is 10")
