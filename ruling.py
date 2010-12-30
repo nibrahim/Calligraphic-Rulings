@@ -53,12 +53,12 @@ def draw_ruling(canvas, nib_width, partitions, gap, nrulings, top_margin):
 def draw_lines_for_angle(canvas, angle):
     "Draws a few lines for the given angle"
     for i in range(0, 500, 20):
-        x0, y0 = i*mm, 0
+        x0, y0 = i*mm, 2*mm
         x1, y1 = compute_endpoint(x0, y0, angle)
         canvas.line(x0, y0, x1, y1)
 
     for i in range(0, 500, 20):
-        x0, y0 = 0, i*mm
+        x0, y0 = 2*mm, i*mm
         x1, y1 = compute_endpoint(x0, y0, angle)
         canvas.line(x0, y0, x1, y1)
 
@@ -68,12 +68,16 @@ def draw_angle_lines(canvas, angles):
     for i in angles:
         draw_lines_for_angle(canvas, i)
         
-def write_title(canvas, text, partitions):
-    canvas.setFillColorRGB(0.7,0.7,0.7)
-    canvas.setFont("Times-Italic", 30)
-    canvas.setTitle(text)
+def write_title(canvas, text, nib_width, partitions):
     canvas.rotate(90)
-    canvas.drawString(20*mm, 0 ,"%s (%s)"%(text,partitions))
+    canvas.setTitle(text)
+    t = canvas.beginText()
+    t.setTextOrigin(20*mm, 0)
+    t.setFont("Times-Italic", 20)
+    t.textOut(text)
+    t.setFont("Times-Italic", 10)
+    t.textOut("  (%smm nib, %s)"%(nib_width,partitions))
+    canvas.drawText(t)
 
 def status_message(opts, args):
     "Prints a status message for the user"
@@ -98,7 +102,7 @@ def main(opts, args):
     if opts.angles:
         draw_angle_lines(c, opts.angles)
     if opts.title:
-        write_title(c, opts.title, opts.partitions)
+        write_title(c, opts.title, opts.nib_width, opts.partitions)
     c.showPage()
     c.save()
 
