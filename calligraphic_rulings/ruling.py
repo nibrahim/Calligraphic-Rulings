@@ -107,7 +107,7 @@ def main(opts, args):
     c.save()
 
 def parse_options(args):
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(usage = "%s [options] output_file"%args[0])
     parser.add_option("-n", "--nib-width", dest = "nib_width", type=float,
                       help = "Width of the nib specified in millimeters. All other measurements are multiples of this.")
     parser.add_option("-p", "--partitions", dest = "partitions", type="string",
@@ -121,8 +121,10 @@ def parse_options(args):
                       help = "Comma separated list of angles (in degrees) for which to draw lines on the page (for pen angle, serifs etc.)")
     parser.add_option("-t", "--title", dest = "title", type = "string",
                       help = "A title for this ruling (usually the font name)")
-
-    return parser.parse_args(args)
+    opts,args =  parser.parse_args(args)
+    if len(args) != 2:
+        parser.error("The output filename is required")
+    return (opts,args)
 
 if __name__ == "__main__":
     import sys
