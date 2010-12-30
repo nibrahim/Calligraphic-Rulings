@@ -18,15 +18,15 @@ def draw_width_markers(canvas, nw):
             canvas.rect(A4[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
 
 def draw_single_line(canvas, position, nib_width, partitions):
-    "Draws rulings for a single line of calligraphic text"
+    """Draws rulings for a single line of calligraphic text. Returns
+    position of last line drawn"""
     print "Drawing at %s"%position
     offset = position
     canvas.line(1*mm, offset, A4[0], offset)
     for i in (float(x) for x in partitions.split(",")):
         offset += i * nib_width * mm
         canvas.line(1*mm, offset, A4[0], offset)
-        print i,"   ",offset
-    print 20*"-"
+    return offset
 
 
 def draw_ruling(canvas, nib_width, partitions, gap, nrulings, top_margin):
@@ -37,7 +37,8 @@ def draw_ruling(canvas, nib_width, partitions, gap, nrulings, top_margin):
     print nrulings
     for i in range(nrulings):
         position = (top_margin * mm * nib_width) + (i * line_height * nib_width * mm) # Margin + position for the current line
-        draw_single_line(canvas, position, nib_width, partitions)
+        offset = draw_single_line(canvas, position, nib_width, partitions)
+        canvas.rect(1*mm, offset, A4[0], gap * nib_width * mm, stroke = 0, fill = 1)
     # idx = 0
     # segments = [float(x) for x in partitions.split(",")]
     # segments.append(gap)
