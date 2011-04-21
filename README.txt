@@ -21,3 +21,4 @@ Usage: ruling.py [options] output_file
       -t TITLE, --title=TITLE
                             A title for this ruling (usually the font name)
 
+Some more specifics at [http://nibrahim.net.in/2010/12/30/calligraphic_rulings.html](http://nibrahim.net.in/2010/12/30/calligraphic_rulings.html).
