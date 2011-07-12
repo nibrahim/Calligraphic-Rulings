@@ -97,11 +97,13 @@ def main(opts, args):
     print status_message(opts, args)
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = A4, cropMarks = True)
     c.setAuthor("ruling.py version %s"%__VERSION__)
+    c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
     draw_width_markers(c, opts.nib_width)
     draw_ruling(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
     if opts.angles:
         draw_angle_lines(c, opts.angles)
     if opts.title:
+        c.setFillColorRGB(0, 0, 0, 1)
         write_title(c, opts.title, opts.nib_width, opts.partitions)
     c.showPage()
     c.save()
