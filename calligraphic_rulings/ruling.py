@@ -29,7 +29,7 @@ def draw_width_markers(canvas, nw):
             canvas.rect(3*mm, i*nw*mm ,2*mm, nw*mm, stroke = 0, fill = 1)
             canvas.rect(A4[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
 
-def draw_single_line(canvas, position, nib_width, partitions):
+def draw_line_set(canvas, position, nib_width, partitions):
     """Draws rulings for a single line of calligraphic text. Returns
     position of last line drawn"""
     offset = position
@@ -39,16 +39,43 @@ def draw_single_line(canvas, position, nib_width, partitions):
         canvas.line(1*mm, offset, A4[0], offset)
     return offset
 
-
-def draw_ruling(canvas, nib_width, partitions, gap, nrulings, top_margin):
+    
+def draw_lines(canvas, nib_width, partitions, gap, nrulings, top_margin):
     "Draws lines and separators on the page"
     line_height = sum((float(x) for x in partitions.split(",")),0.0) # Sum of the ascenders, descenders and body
     line_height += gap # Add the gap
     canvas.rect(1*mm, 1*mm, A4[0], top_margin * mm * nib_width, stroke = 0, fill = 1)
     for i in range(nrulings):
         position = (top_margin * mm * nib_width) + (i * line_height * nib_width * mm) # Margin + position for the current line
-        offset = draw_single_line(canvas, position, nib_width, partitions)
+        offset = draw_line_set(canvas, position, nib_width, partitions)
         canvas.rect(1*mm, offset, A4[0], gap * nib_width * mm, stroke = 0, fill = 1)
+
+def draw_circle_set(canvas, x, y, radius, nib_width, partitions):
+    """
+    Draws concentric circles of the given radius. 
+    """
+    offset = radius
+    for i in (float(x) for x in partitions.split(",")):
+        print " ", offset,
+        offset += i *nib_width * mm
+        print "->", offset
+        canvas.circle(x, y, offset)
+    return offset
+
+
+def draw_circles(canvas, nib_width, partitions, gap, nrulings, top_margin, center):
+    "Draws circles and separators on the page"
+    circle_radius = sum((float(x) for x in partitions.split(",")),0.0) # Sum of the ascenders, descenders and body
+    circle_radius += gap # Add the gap
+    offset = top_margin * mm * nib_width
+    canvas.circle(center[0], center[1], offset, fill = 1)
+    for i in range(nrulings):
+        print offset
+        offset = draw_circle_set(canvas, center[0], center[1], offset, nib_width, partitions)
+        gap_radius = offset + (gap * nib_width * mm)
+        canvas.circle(center[0], center[1], gap_radius)
+        offset += gap *nib_width * mm
+
 
 def draw_lines_for_angle(canvas, angle):
     "Draws a few lines for the given angle"
@@ -81,16 +108,20 @@ def write_title(canvas, text, nib_width, partitions, angles):
 
 def status_message(opts, args):
     "Prints a status message for the user"
+    if opts.radial:
+        style = "radial"
+    else:
+        style = "linear"
     return """Ruling.py version %s
 ------------------------------------------------------------
-Creating ruling sheet for '%s'
+Creating %s ruling sheet for '%s'
 Output file                            : %s
 Nib width                              : %smm
 Partitions per line (in nib widths)    : %s
 Gap between lines (in nib widths)      : %s
 Top margin : (in nib widths)           : %s
 Angle markings for angles (in degrees) : %s
-------------------------------------------------------------"""%(__VERSION__, opts.title or "untitled", args[1], opts.nib_width,
+------------------------------------------------------------"""%(__VERSION__, style, opts.title or "untitled", args[1], opts.nib_width,
 opts.partitions, opts.gap, opts.top_margin, opts.angles or "No angle markings")
 
 def main(opts, args):
@@ -98,31 +129,41 @@ def main(opts, args):
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = A4, cropMarks = True)
     c.setAuthor("ruling.py version %s"%__VERSION__)
     c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
-    draw_width_markers(c, opts.nib_width)
-    draw_ruling(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
-    if opts.angles:
-        draw_angle_lines(c, opts.angles)
-    if opts.title:
-        c.setFillColorRGB(0, 0, 0, 1)
-        write_title(c, opts.title, opts.nib_width, opts.partitions, opts.angles)
+    if not opts.radial:
+        draw_width_markers(c, opts.nib_width)
+        draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
+        if opts.angles:
+            draw_angle_lines(c, opts.angles)
+        if opts.title:
+            c.setFillColorRGB(0, 0, 0, 1)
+            write_title(c, opts.title, opts.nib_width, opts.partitions, opts.angles)
+    else:
+        x, y = A4
+        center = (x/2.0, y/2.0)
+        draw_circles(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, center)
+        
+
+            
     c.showPage()
     c.save()
 
 def parse_options(args):
     parser = optparse.OptionParser(usage = "%s [options] output_file"%args[0])
-    parser.add_option("-n", "--nib-width", dest = "nib_width", type=float,
+    parser.add_option("-w", "--nib-width", dest = "nib_width", type=float,
                       help = "Width of the nib specified in millimeters. All other measurements are multiples of this.")
     parser.add_option("-p", "--partitions", dest = "partitions", type="string",
                       help = "Comma separated list of partitions in each line (specified in nib widths)")
     parser.add_option("-g", "--gap", dest = "gap", type=float, help = "gap between lines (specified in nib widths)")
     parser.add_option("--top-margin", dest = "top_margin", default = 2, type = int,
                       help = "Top margin (specified in nib widths). Default is 2")
-    parser.add_option("-r", "--rulings", dest = "rulings", default = 10, type=int,
+    parser.add_option("-n", "--rulings", dest = "rulings", default = 10, type=int,
                       help = "How many rulings to draw. Default is 10")
     parser.add_option("-a", "--angle", dest = "angles", type = "string",
                       help = "Comma separated list of angles (in degrees) for which to draw lines on the page (for pen angle, serifs etc.)")
     parser.add_option("-t", "--title", dest = "title", type = "string",
                       help = "A title for this ruling (usually the font name)")
+    parser.add_option("-r", "--radial", dest = 'radial', action="store_true", default = False,
+                      help = "Draw circles instead of straight lines")
     opts,args =  parser.parse_args(args)
     if len(args) != 2:
         parser.error("The output filename is required")
