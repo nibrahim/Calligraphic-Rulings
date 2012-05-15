@@ -56,25 +56,35 @@ def draw_circle_set(canvas, x, y, radius, nib_width, partitions):
     """
     offset = radius
     for i in (float(x) for x in partitions.split(",")):
+        canvas.circle(x, y, offset, fill = 1)
         print " ", offset,
-        offset += i *nib_width * mm
+        offset -= i *nib_width * mm
         print "->", offset
-        canvas.circle(x, y, offset)
+
     return offset
 
 
 def draw_circles(canvas, nib_width, partitions, gap, nrulings, top_margin, center):
     "Draws circles and separators on the page"
-    circle_radius = sum((float(x) for x in partitions.split(",")),0.0) # Sum of the ascenders, descenders and body
-    circle_radius += gap # Add the gap
-    offset = top_margin * mm * nib_width
-    canvas.circle(center[0], center[1], offset, fill = 1)
-    for i in range(nrulings):
+    partition_radius = sum((float(x) for x in partitions.split(",")),0.0) # Sum of the ascenders, descenders and body
+    partition_radius += gap # Add the gap
+
+    offset = nrulings * partition_radius * nib_width * mm
+    
+    for i in range(nrulings, 1, -1):
+        print offset,"->",
+        # Draw gap
+        canvas.setFillColorRGB(0, 0, 0, 1)
+        canvas.circle(center[0], center[1], offset, fill = 1, stroke = 1)
+        offset -= gap *nib_width * mm
         print offset
+        # Draw partitions
+        canvas.setFillColorRGB(1, 1, 1, 1)
         offset = draw_circle_set(canvas, center[0], center[1], offset, nib_width, partitions)
-        gap_radius = offset + (gap * nib_width * mm)
-        canvas.circle(center[0], center[1], gap_radius)
-        offset += gap *nib_width * mm
+
+    # Draw initial inner margin
+    canvas.setFillColorRGB(0.5, 0.5, 0.5, 1)
+    canvas.circle(center[0], center[1], offset, fill = 1, stroke = 1)
 
 
 def draw_lines_for_angle(canvas, angle):
@@ -95,8 +105,9 @@ def draw_angle_lines(canvas, angles):
     for i in angles:
         draw_lines_for_angle(canvas, i)
         
-def write_title(canvas, text, nib_width, partitions, angles):
-    canvas.rotate(90)
+def write_title(canvas, text, nib_width, partitions, angles, horizontal = False):
+    if not horizontal:
+        canvas.rotate(90)
     canvas.setTitle(text)
     t = canvas.beginText()
     t.setTextOrigin(20*mm, 0)
@@ -134,15 +145,14 @@ def main(opts, args):
         draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
         if opts.angles:
             draw_angle_lines(c, opts.angles)
-        if opts.title:
-            c.setFillColorRGB(0, 0, 0, 1)
-            write_title(c, opts.title, opts.nib_width, opts.partitions, opts.angles)
     else:
         x, y = A4
         center = (x/2.0, y/2.0)
         draw_circles(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, center)
-        
 
+    if opts.title:
+        c.setFillColorRGB(0, 0, 0, 1)
+        write_title(c, opts.title, opts.nib_width, opts.partitions, opts.angles, opts.radial)
             
     c.showPage()
     c.save()
