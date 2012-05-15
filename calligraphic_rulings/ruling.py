@@ -68,7 +68,7 @@ def draw_angle_lines(canvas, angles):
     for i in angles:
         draw_lines_for_angle(canvas, i)
         
-def write_title(canvas, text, nib_width, partitions):
+def write_title(canvas, text, nib_width, partitions, angles):
     canvas.rotate(90)
     canvas.setTitle(text)
     t = canvas.beginText()
@@ -76,7 +76,7 @@ def write_title(canvas, text, nib_width, partitions):
     t.setFont("Times-Italic", 20)
     t.textOut(text)
     t.setFont("Times-Italic", 10)
-    t.textOut("  (%smm nib, %s)"%(nib_width,partitions))
+    t.textOut("  (%smm nib, Partitions:%s, angles:%s)"%(nib_width, partitions, angles))
     canvas.drawText(t)
 
 def status_message(opts, args):
@@ -104,7 +104,7 @@ def main(opts, args):
         draw_angle_lines(c, opts.angles)
     if opts.title:
         c.setFillColorRGB(0, 0, 0, 1)
-        write_title(c, opts.title, opts.nib_width, opts.partitions)
+        write_title(c, opts.title, opts.nib_width, opts.partitions, opts.angles)
     c.showPage()
     c.save()
 
