@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="calligraphic-rulings",
-    version="0.1alpha",
+    version="0.2alpha",
     description='Script to generate ruling pages for western calligraphy',
     long_description=open('README.txt').read(),
     license='GPL',
