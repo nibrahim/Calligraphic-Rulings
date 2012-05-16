@@ -19,7 +19,7 @@ def compute_endpoint(x0, y0, angle):
     
 
 # Functions to draw different things on the canvas
-def draw_width_markers(canvas, nw):
+def draw_linear_width_markers(canvas, nw):
     "Draws markers on the right and left indicating pen nib widths"
     for i in range(0, int(300/nw)):
         if i%2 == 0:
@@ -50,6 +50,17 @@ def draw_lines(canvas, nib_width, partitions, gap, nrulings, top_margin):
         offset = draw_line_set(canvas, position, nib_width, partitions)
         canvas.rect(1*mm, offset, A4[0], gap * nib_width * mm, stroke = 0, fill = 1)
 
+# def draw_radial_width_markers(canvas, center, nib_width):
+#     for i in range(0, int(300/nw)):
+#         if i%2 == 0:
+#             canvas.rect(1*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+#             canvas.rect(A4[0]-4*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+#         else:
+#             canvas.rect(3*mm, i*nw*mm ,2*mm, nw*mm, stroke = 0, fill = 1)
+#             canvas.rect(A4[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+
+
+
 def draw_circle_set(canvas, x, y, radius, nib_width, partitions):
     """
     Draws concentric circles of the given radius. 
@@ -62,7 +73,6 @@ def draw_circle_set(canvas, x, y, radius, nib_width, partitions):
         print "->", offset
 
     return offset
-
 
 def draw_circles(canvas, nib_width, partitions, gap, nrulings, top_margin, center):
     "Draws circles and separators on the page"
@@ -141,13 +151,14 @@ def main(opts, args):
     c.setAuthor("ruling.py version %s"%__VERSION__)
     c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
     if not opts.radial:
-        draw_width_markers(c, opts.nib_width)
+        draw_linear_width_markers(c, opts.nib_width)
         draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
         if opts.angles:
             draw_angle_lines(c, opts.angles)
     else:
         x, y = A4
         center = (x/2.0, y/2.0)
+        # draw_radial_width_markers(c, center, opts.nib_width)
         draw_circles(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, center)
 
     if opts.title:
