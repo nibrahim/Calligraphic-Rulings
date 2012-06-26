@@ -1,0 +1,43 @@
+<!doctype html>
+<title>Ruling sheet generator</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"/>
+<div class="page">
+<h1>Ruling sheet generator</h1>
+<form action="{{ url_for('index') }}" method=post>
+  <input id="nib_width" type="number" name="nib_width" required/> 
+  <label for="nib_width">Nib width (in mm)</label>
+  (All other measurements are in multiples of this)
+  <br/>
+  <input id="partitions" type="text" name="partitions" required/>
+  <label for="partitions">Partitions</label>
+  (Comma separated list of partitions)
+  <br/>
+  <input id="gap" type="number" name="gap"/>
+  <label for="gap">Gap</label>
+  (Gap between rulings)
+  <br/>
+  <input id="top_margin" type="number" name="top_margin"/>
+  <label for="top_margin">Top margin</label>
+  (Margin at the the top)
+  <br/>
+  <input id="rulings" type="number" name="rulings" value="10"/>
+  <label for="rulings">Number of rulings</label>
+  (Number of rulings)
+  <br/>
+  <input id="angles" type="text" name="angles" />
+  <label for="angles">Angle guides</label>
+  (Comma separated list of angle guides in degrees)
+  <br/>
+  <input id="title" type="text" name="title" />
+  <label for="title">Title</label>
+  (Title for this sheet - usually the hand and nib names)
+  <br/>
+  <input id="radial" type="checkbox" name="radial" /> 
+  <label for="radial">Radial</label>
+  (Check if you want a radial rather than a linear sheet - experimental)
+  <br/>
+  <input type="submit" name="generate" value="generate"/>
+
+</form>
+</div>
+
