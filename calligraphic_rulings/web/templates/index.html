@@ -1,43 +1,83 @@
 <!doctype html>
+<head>
 <title>Ruling sheet generator</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"/>
-<div class="page">
-<h1>Ruling sheet generator</h1>
-<form action="{{ url_for('index') }}" method=post>
-  <input id="nib_width" type="number" name="nib_width" required/> 
-  <label for="nib_width">Nib width (in mm)</label>
-  (All other measurements are in multiples of this)
-  <br/>
-  <input id="partitions" type="text" name="partitions" required/>
-  <label for="partitions">Partitions</label>
-  (Comma separated list of partitions)
-  <br/>
-  <input id="gap" type="number" name="gap"/>
-  <label for="gap">Gap</label>
-  (Gap between rulings)
-  <br/>
-  <input id="top_margin" type="number" name="top_margin"/>
-  <label for="top_margin">Top margin</label>
-  (Margin at the the top)
-  <br/>
-  <input id="rulings" type="number" name="rulings" value="10"/>
-  <label for="rulings">Number of rulings</label>
-  (Number of rulings)
-  <br/>
-  <input id="angles" type="text" name="angles" />
-  <label for="angles">Angle guides</label>
-  (Comma separated list of angle guides in degrees)
-  <br/>
-  <input id="title" type="text" name="title" />
-  <label for="title">Title</label>
-  (Title for this sheet - usually the hand and nib names)
-  <br/>
-  <input id="radial" type="checkbox" name="radial" /> 
-  <label for="radial">Radial</label>
-  (Check if you want a radial rather than a linear sheet - experimental)
-  <br/>
-  <input type="submit" name="generate" value="generate"/>
+</head>
 
-</form>
-</div>
+<body>
+  <header>
+    <h1>Calligraphy ruling sheet generator</h1>
+  </header>
+  <body>
+    <h2> Generator</h2>
+  <form action="{{ url_for('index') }}" method=post>
+    <label for="nib_width">Nib width in mm (All other measurements are in multiples of this) </label>  
+  <input id="nib_width" type="number" name="nib_width" required/> 
+    
+    <label for="partitions">Partitions (Comma separated list of partitions)</label>
+    <input id="partitions" type="text" name="partitions" required/>
+    
+    <label for="gap">Gap (Gap between rulings)</label>
+    <input id="gap" type="number" name="gap" value="3" required/> 
+    
+    <label for="top_margin">Top margin (Margin at the the top)</label>
+    <input id="top_margin" type="number" name="top_margin" value="3" required/>    
+
+
+    <label for="rulings">Number of rulings (Number of rulings)</label>    
+    <input id="rulings" type="number" name="rulings" value="10" required/> 
+    
+    <label for="angles">Angle guides (Comma separated list of angle guides in degrees)</label>
+    <input id="angles" type="text" name="angles" /> 
+    
+    <label for="title">Title (Title for this sheet)</label>
+    <input id="title" type="text" name="title" required value="ruling"/> 
+    
+    <label for="radial">Radial (Check if you want a radial rather than a linear sheet)</label>
+    <input id="radial" type="checkbox" name="radial" /> 
+    <br/>
+    <input type="submit" name="generate" value="generate"/>
+
+  </form>
+
+
+  <h2> History </h2>
+    I have a dilettante's interest in calligraphy but was often put off by the tedium of ruling my practice sheets. Being a programmer by trade, I wrote <a href="https://github.com/nibrahim/Calligraphic-Rulings">a little script</a> that generated PDFs for this. Someone on the excellent <a href="http://www.calligraph.com/cyberscribes/">cyberscribes mailing list</a> asked for such a tool so I wrapped it up as a web application and put it online here. 
+    <h2> Usage </h2>
+    Following is a description of each field. 
+    <dl>
+      <dt>Nib width</dt>
+      <dd>This is the width of your nib in millimeters. All other measurements (unless specified otherwise) are in multiples of this. A Speedball C3 nib which I most commonly use for practice is approximately 2mm wide. For that, you'd enter <code>2</code> here.</dd>
+      <dt>Partitions</dt>
+      <dd>This is a list of partitions which each line should have. For a hand like the <a href="http://www.clas.co.uk/px/starting-out-2.jpg">Foundational</a>, the x-height is 4 nib widths, the ascenders go upto 3 nibs about the waist line and the descenders drop to 3 nib widths below the base line. This means that you would enter <code>3,4,3</code> in the partitions box and you'd get rulings giving you your cap line, waist line, base line and drop line. It will automatically adjust this based on your nib width. Fractions are allowed here so you can say things like <code>2.5,3,4.5</code> and it will work. You can put as many partitions are you want separated by commas.</dd>
+      <dt>Gap</dt>
+      <dd>This is the gap between successive lines. It will be greyed out so will appear as a thick bar.</dd>
+      <dt>Top margin</dt>
+      <dd>These many nib widths will be skipped and greyed out at the top.</dd>
+      <dt>Number of rulings</dt>
+      <dd>The number of lines of text you want the ruling sheet to be generated for.</dd>
+      <dt>Angle guides</dt>
+      <dd>You can specify a comma separated list of numbers here and the sheet will have lines drawn at these angles. Useful for people like me who need a guide to hold their nibs properly. It's also useful for some scripts like the Italic hand where the text needs a slight inclination.</dd>
+      <dt>Title</dt>
+      <dd>You can type something here and it will appear in bold on the right of your sheet. I usually put the nib names here so that I can pick things out easily.</dd>
+      <dt>Radial</dt>
+      <dd>This is an experimental feature. If you select this, the program will generate a concentric circles with the above specifications rather than parallel lines. This is useful to write circular text. This is a work in progress so feedback is welcome.</dd>
+    </dl>
+    The script will also draw a nib ladder on either side of the paper for you to double check. It is currently limited to only A4 sheets.
+
+    The diagram below indicates what the various fields control. 
+
+    <img src="{{ url_for('static', filename='details.png') }}"/>
+
+    <h2> Thanks </h2>
+    I'd love to have <a href="mailto:noufal@nibrahim.net.in">emails and feedback</a> about the script especially from professional calligraphers. Programmers can file issues on the <a href="https://github.com/nibrahim/Calligraphic-Rulings/issues">github tracker</a>. If you <em>really</em> want to thank me, here is my <a href="http://www.amazon.com/gp/registry/wishlist/1CDRFGRMHO4K8/ref=topnav_lists_1">Amazon wishlist</a>. :)
+  </body>
+<footer>
+Copyright 2012 - <a href="http://nibrahim.net.in">Noufal Ibrahim</a>. <em>noufal@nibrahim.net.in</em>
+<br/>
+  Code for this website is available at <a href="https://github.com/nibrahim/Calligraphic-Rulings">https://github.com/nibrahim/Calligraphic-Rulings</a>.
+  <br/>
+  Styling for the form above taken from <a href="http://www.html5rocks.com/en/tutorials/forms/html5forms/">html5rocks</a>.
+</footer>
+</body>
 

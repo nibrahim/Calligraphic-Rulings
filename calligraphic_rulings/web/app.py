@@ -23,15 +23,14 @@ def index():
                       ('title', str),
                       ('radial', bool),
                       ('rulings', int)]:
-            print "Setting ",i
             setattr(cfg, i, typ(request.form.get(i,'')))
-        title = request.form.get('title','rulings').replace(" ","_").lower() + ".pdf"
+        fname = request.form.get('title','rulings').replace(" ","_").lower() + ".pdf"
         s = StringIO.StringIO()
         main(cfg, [None, s])
 
         resp = make_response(s.getvalue())
         resp.headers['Content-Type'] = 'application/pdf'
-        resp.headers['Content-Disposition'] = 'attachment; filename=%s'%title
+        resp.headers['Content-Disposition'] = 'attachment; filename=%s'%fname
         return resp
     
                     
