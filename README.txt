@@ -23,4 +23,4 @@ Options:
   -r, --radial          Draw circles instead of straight lines
 
 
-Some more specifics at [http://nibrahim.net.in/2010/12/30/calligraphic_rulings.html](http://nibrahim.net.in/2010/12/30/calligraphic_rulings.html).
+Some more specifics at <http://nibrahim.net.in/2010/12/30/calligraphic_rulings.html>.
