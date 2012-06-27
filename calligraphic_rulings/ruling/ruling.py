@@ -115,17 +115,29 @@ def draw_angle_lines(canvas, angles):
     for i in angles:
         draw_lines_for_angle(canvas, i)
         
-def write_title(canvas, text, nib_width, partitions, angles, horizontal = False):
+def write_title_and_credits(canvas, text, nib_width, partitions, angles, horizontal = False):
+    canvas.setFillColorRGB(0, 0, 0, 1)
     if not horizontal:
         canvas.rotate(90)
-    canvas.setTitle(text)
     t = canvas.beginText()
-    t.setTextOrigin(20*mm, 0)
-    t.setFont("Times-Italic", 20)
-    t.textOut(text)
+    if text:
+        canvas.setTitle(text)
+        t.setTextOrigin(20*mm, 0)
+        t.setFont("Times-Italic", 20)
+        t.textOut(text)
+        t.setFont("Times-Italic", 10)
+        t.textOut("  (%smm nib, Partitions:%s, angles:%s)"%(nib_width, partitions, angles))
+
+    # canvas.setFillColorRGB(0, 0, 0, 0.2)
+    # w,l = (float(x)/100 for x in A4)
+    # print w,",",l
+    # t.setTextOrigin(l*50, 0)
+    t.setFont("Times-Roman", 10)
+    t.textOut("       Generated using ")
     t.setFont("Times-Italic", 10)
-    t.textOut("  (%smm nib, Partitions:%s, angles:%s)"%(nib_width, partitions, angles))
+    t.textOut("http://noufalibrahim.name/rulings")
     canvas.drawText(t)
+
 
 def status_message(opts, args):
     "Prints a status message for the user"
@@ -161,10 +173,8 @@ def main(opts, args):
         # draw_radial_width_markers(c, center, opts.nib_width)
         draw_circles(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, center)
 
-    if opts.title:
-        c.setFillColorRGB(0, 0, 0, 1)
-        write_title(c, opts.title, opts.nib_width, opts.partitions, opts.angles, opts.radial)
-            
+    write_title_and_credits(c, opts.title, opts.nib_width, opts.partitions, opts.angles, opts.radial)
+
     c.showPage()
     c.save()
 
