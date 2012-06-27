@@ -9,28 +9,30 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def index():
-    if request.method == "GET":
-        return render_template('index.html')
-    elif request.method == "POST":
-        cfg = lambda :0 # Dummy object which can have attributes
-        for i,typ in [('nib_width', float),
-                      ('partitions', str),
-                      ('gap',float),
-                      ('top_margin',int),
-                      ('angles', str),
-                      ('title', str),
-                      ('radial', bool),
-                      ('rulings', int)]:
-            setattr(cfg, i, typ(request.form.get(i,'')))
-        fname = request.form.get('title','rulings').replace(" ","_").lower() + ".pdf"
-        s = StringIO.StringIO()
-        main(cfg, [None, s])
+    return render_template('index.html')
 
-        resp = make_response(s.getvalue())
-        resp.headers['Content-Type'] = 'application/pdf'
-        resp.headers['Content-Disposition'] = 'attachment; filename=%s'%fname
-        return resp
-    
-                    
+@app.route("/pdf")
+def pdf():
+    cfg = lambda :0 # Dummy object which can have attributes
+    for i,typ in [('nib_width', float),
+                  ('partitions', str),
+                  ('gap',float),
+                  ('top_margin',int),
+                  ('angles', str),
+                  ('title', str),
+                  ('radial', bool),
+                  ('rulings', int)]:
+        print i, "   ", request.args.get(i,'')
+        setattr(cfg, i, typ(request.args.get(i,'')))
+    fname = request.args.get('title','rulings').replace(" ","_").lower() + ".pdf"
+    s = StringIO.StringIO()
+    main(cfg, [None, s])
+
+    resp = make_response(s.getvalue())
+    resp.headers['Content-Type'] = 'application/pdf'
+    resp.headers['Content-Disposition'] = 'attachment; filename=%s'%fname
+    return resp
+
+

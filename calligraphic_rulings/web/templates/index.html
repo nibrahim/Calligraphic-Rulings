@@ -10,10 +10,10 @@
   </header>
   <body>
     <h2> Generator</h2>
-  <form action="{{ url_for('index') }}" method=post>
+  <form action="{{ url_for('pdf') }}" method="get">
     <label for="nib_width">Nib width in mm (All other measurements are in multiples of this) </label>  
-  <input id="nib_width" type="number" name="nib_width" required/> 
-    
+    <input id="nib_width" type="text" name="nib_width" required/> 
+  
     <label for="partitions">Partitions (Comma separated list of partitions)</label>
     <input id="partitions" type="text" name="partitions" required/>
     
