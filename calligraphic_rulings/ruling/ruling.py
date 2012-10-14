@@ -3,20 +3,20 @@
 import math
 import optparse
 
-from reportlab.pdfgen import canvas, textobject, pdfimages
+from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 from reportlab.lib.pagesizes import A4
 
 __VERSION__ = "0.1alpha"
 
 # Utility functions
-def compute_endpoint(x0, y0, angle):
-    "Computes the endpoing for a given angle"
-    h = math.sqrt(sum(x**2 for x in A4))
+def compute_endpoint(x0, y0, angle, h = False):
+    "Computes the endpoint for a given angle"
+    if not h:
+        h = math.sqrt(sum(x**2 for x in A4))
     x = x0 + h * math.cos(math.radians(angle))
     y = y0 + h * math.sin(math.radians(angle))
     return x, y
-    
 
 # Functions to draw different things on the canvas
 def draw_linear_width_markers(canvas, nw):
@@ -97,23 +97,40 @@ def draw_circles(canvas, nib_width, partitions, gap, nrulings, top_margin, cente
     canvas.circle(center[0], center[1], offset, fill = 1, stroke = 1)
 
 
-def draw_lines_for_angle(canvas, angle):
+
+def draw_lines_for_angle(canvas, angle, distance):
     "Draws a few lines for the given angle"
-    for i in range(0, 500, 20):
-        x0, y0 = i*mm, 2*mm
-        x1, y1 = compute_endpoint(x0, y0, angle)
-        canvas.line(x0, y0, x1, y1)
+    x = A4[0]
+    y = 0
+    move_angle = 90 + angle
+    m = math.tan(math.radians(angle))
+    while True:
+        d = distance*mm
+        xr = A4[0]
+        yr = m * (xr - x) + y
+        canvas.line(x, y, xr, yr)
+        
+        yl = 0
+        xl = (yl - y + m*x)/m
+        if xl < 0:
+            xl = 0
+            yl = m * (xl - x) + y
+        canvas.line(x, y, xl, yl)
+        
+        if xr < 0 or yl > A4[1]:
+            break
 
-    for i in range(0, 500, 20):
-        x0, y0 = 2*mm, i*mm
-        x1, y1 = compute_endpoint(x0, y0, angle)
-        canvas.line(x0, y0, x1, y1)
+        # canvas.circle(x, y, 10, fill = 1, stroke = 1)        
+        x, y = compute_endpoint(x, y, move_angle, d)
 
-def draw_angle_lines(canvas, angles):
+
+
+
+def draw_angle_lines(canvas, angles, distance):
     "Draws oblique lines to help with pen positioning and serifs"
     angles = (float(x.strip()) for x in angles.split(","))
     for i in angles:
-        draw_lines_for_angle(canvas, i)
+        draw_lines_for_angle(canvas, i, distance)
         
 def write_title_and_credits(canvas, text, nib_width, partitions, angles, horizontal = False):
     canvas.setFillColorRGB(0, 0, 0, 1)
@@ -166,7 +183,7 @@ def main(opts, args):
         draw_linear_width_markers(c, opts.nib_width)
         draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
         if opts.angles:
-            draw_angle_lines(c, opts.angles)
+            draw_angle_lines(c, opts.angles, opts.distance)
     else:
         x, y = A4
         center = (x/2.0, y/2.0)
@@ -191,6 +208,8 @@ def parse_options(args):
                       help = "How many rulings to draw. Default is 10")
     parser.add_option("-a", "--angle", dest = "angles", type = "string",
                       help = "Comma separated list of angles (in degrees) for which to draw lines on the page (for pen angle, serifs etc.)")
+    parser.add_option("-d", "--distance", dest = "distance", type = int,
+                      help = "Distance (in mm) between angle guides")
     parser.add_option("-t", "--title", dest = "title", type = "string",
                       help = "A title for this ruling (usually the font name)")
     parser.add_option("-r", "--radial", dest = 'radial', action="store_true", default = False,
