@@ -5,50 +5,54 @@ import optparse
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, A3
+ 
+page_sizes = {"A4" : A4,
+              "A3" : A3}
+
 
 __VERSION__ = "0.1alpha"
 
 # Utility functions
-def compute_endpoint(x0, y0, angle, h = False):
+def compute_endpoint(x0, y0, angle, pagesize, h = False):
     "Computes the endpoint for a given angle"
     if not h:
-        h = math.sqrt(sum(x**2 for x in A4))
+        h = math.sqrt(sum(x**2 for x in pagesize))
     x = x0 + h * math.cos(math.radians(angle))
     y = y0 + h * math.sin(math.radians(angle))
     return x, y
 
 # Functions to draw different things on the canvas
-def draw_linear_width_markers(canvas, nw):
+def draw_linear_width_markers(canvas, nw, pagesize):
     "Draws markers on the right and left indicating pen nib widths"
     for i in range(0, int(300/nw)):
         if i%2 == 0:
             canvas.rect(1*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
-            canvas.rect(A4[0]-4*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+            canvas.rect(pagesize[0]-4*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
         else:
             canvas.rect(3*mm, i*nw*mm ,2*mm, nw*mm, stroke = 0, fill = 1)
-            canvas.rect(A4[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
+            canvas.rect(pagesize[0]-2*mm, i*nw*mm, 2*mm, nw*mm, stroke = 0, fill = 1)
 
-def draw_line_set(canvas, position, nib_width, partitions):
+def draw_line_set(canvas, position, nib_width, partitions, pagesize):
     """Draws rulings for a single line of calligraphic text. Returns
     position of last line drawn"""
     offset = position
-    canvas.line(1*mm, offset, A4[0], offset)
+    canvas.line(1*mm, offset, pagesize[0], offset)
     for i in (float(x) for x in partitions.split(",")):
         offset += i * nib_width * mm
-        canvas.line(1*mm, offset, A4[0], offset)
+        canvas.line(1*mm, offset, pagesize[0], offset)
     return offset
 
     
-def draw_lines(canvas, nib_width, partitions, gap, nrulings, top_margin):
+def draw_lines(canvas, nib_width, partitions, gap, nrulings, top_margin, pagesize):
     "Draws lines and separators on the page"
     line_height = sum((float(x) for x in partitions.split(",")),0.0) # Sum of the ascenders, descenders and body
     line_height += gap # Add the gap
-    canvas.rect(1*mm, 1*mm, A4[0], top_margin * mm * nib_width, stroke = 0, fill = 1)
+    canvas.rect(1*mm, 1*mm, pagesize[0], top_margin * mm * nib_width, stroke = 0, fill = 1)
     for i in range(nrulings):
         position = (top_margin * mm * nib_width) + (i * line_height * nib_width * mm) # Margin + position for the current line
-        offset = draw_line_set(canvas, position, nib_width, partitions)
-        canvas.rect(1*mm, offset, A4[0], gap * nib_width * mm, stroke = 0, fill = 1)
+        offset = draw_line_set(canvas, position, nib_width, partitions, pagesize)
+        canvas.rect(1*mm, offset, pagesize[0], gap * nib_width * mm, stroke = 0, fill = 1)
 
 # def draw_radial_width_markers(canvas, center, nib_width):
 #     for i in range(0, int(300/nw)):
@@ -98,15 +102,15 @@ def draw_circles(canvas, nib_width, partitions, gap, nrulings, top_margin, cente
 
 
 
-def draw_lines_for_angle(canvas, angle, distance):
-    "Draws a few lines for the given angle"
-    x = A4[0]
+def draw_lines_for_angle(canvas, angle, distance, pagesize):
+    "Draws a few lines for the given angle"    
+    x = pagesize[0]
     y = 0
     move_angle = 90 + angle
     m = math.tan(math.radians(angle))
     while True:
         d = distance*mm
-        xr = A4[0]
+        xr = pagesize[0]
         yr = m * (xr - x) + y
         canvas.line(x, y, xr, yr)
         
@@ -117,20 +121,19 @@ def draw_lines_for_angle(canvas, angle, distance):
             yl = m * (xl - x) + y
         canvas.line(x, y, xl, yl)
         
-        if xr < 0 or yl > A4[1]:
+        if xr < 0 or yl > pagesize[1]:
             break
 
         # canvas.circle(x, y, 10, fill = 1, stroke = 1)        
-        x, y = compute_endpoint(x, y, move_angle, d)
+        x, y = compute_endpoint(x, y, move_angle, pagesize, d)
 
 
 
-
-def draw_angle_lines(canvas, angles, distance):
+def draw_angle_lines(canvas, angles, distance, pagesize):
     "Draws oblique lines to help with pen positioning and serifs"
     angles = (float(x.strip()) for x in angles.split(","))
     for i in angles:
-        draw_lines_for_angle(canvas, i, distance)
+        draw_lines_for_angle(canvas, i, distance, pagesize)
         
 def write_title_and_credits(canvas, text, nib_width, partitions, angles, horizontal = False):
     canvas.setFillColorRGB(0, 0, 0, 1)
@@ -164,28 +167,29 @@ def status_message(opts, args):
         style = "linear"
     return """Ruling.py version %s
 ------------------------------------------------------------
-Creating %s ruling sheet for '%s'
+Creating %s ruling sheet for '%s' (size %s)
 Output file                            : %s
 Nib width                              : %smm
 Partitions per line (in nib widths)    : %s
 Gap between lines (in nib widths)      : %s
 Top margin : (in nib widths)           : %s
 Angle markings for angles (in degrees) : %s
-------------------------------------------------------------"""%(__VERSION__, style, opts.title or "untitled", args[1], opts.nib_width,
+------------------------------------------------------------"""%(__VERSION__, style, opts.title or "untitled", opts.pagesize, args[1], opts.nib_width,
 opts.partitions, opts.gap, opts.top_margin, opts.angles or "No angle markings")
 
 def main(opts, args):
     print status_message(opts, args)
-    c = canvas.Canvas(args[1], bottomup = 1, pagesize = A4, cropMarks = True)
+    pagesize = page_sizes[opts.pagesize]
+    c = canvas.Canvas(args[1], bottomup = 1, pagesize = pagesize, cropMarks = True)
     c.setAuthor("ruling.py version %s"%__VERSION__)
     c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
     if not opts.radial:
-        draw_linear_width_markers(c, opts.nib_width)
-        draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin)
+        draw_linear_width_markers(c, opts.nib_width, pagesize)
+        draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, pagesize)
         if opts.angles:
-            draw_angle_lines(c, opts.angles, opts.distance)
+            draw_angle_lines(c, opts.angles, opts.distance, pagesize)
     else:
-        x, y = A4
+        x, y = pagesize
         center = (x/2.0, y/2.0)
         # draw_radial_width_markers(c, center, opts.nib_width)
         draw_circles(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, center)
@@ -214,6 +218,9 @@ def parse_options(args):
                       help = "A title for this ruling (usually the font name)")
     parser.add_option("-r", "--radial", dest = 'radial', action="store_true", default = False,
                       help = "Draw circles instead of straight lines")
+    parser.add_option("-s", "--pagesize", dest = 'pagesize', default = "A4",
+                      help = "Size of sheet")
+
     opts,args =  parser.parse_args(args)
     if len(args) != 2:
         parser.error("The output filename is required")
