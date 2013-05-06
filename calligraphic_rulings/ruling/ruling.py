@@ -131,14 +131,14 @@ def draw_angle_lines(canvas, angles, distance, pagesize):
     for i in angles:
         draw_lines_for_angle(canvas, i, distance, pagesize)
         
-def write_title_and_credits(canvas, text, nib_width, partitions, angles, horizontal = False):
+def write_title_and_credits(canvas, text, nib_width, partitions, angles, pagesize, horizontal = False):
     canvas.setFillColorRGB(0, 0, 0, 1)
     if not horizontal:
         canvas.rotate(90)
     t = canvas.beginText()
     if text:
         canvas.setTitle(text)
-        t.setTextOrigin(20*mm, 0)
+        t.setTextOrigin(10*mm, 3*mm)
         t.setFont("Times-Italic", 20)
         t.textOut(text)
         t.setFont("Times-Italic", 10)
@@ -147,9 +147,10 @@ def write_title_and_credits(canvas, text, nib_width, partitions, angles, horizon
     # canvas.setFillColorRGB(0, 0, 0, 0.2)
     # w,l = (float(x)/100 for x in A4)
     # print w,",",l
-    # t.setTextOrigin(l*50, 0)
+    if not horizontal:
+        t.setTextOrigin(10*mm, -pagesize[0]-5*mm)
     t.setFont("Times-Roman", 10)
-    t.textOut("       Generated using ")
+    t.textOut(" Generated using ")
     t.setFont("Times-Italic", 10)
     t.textOut("http://noufalibrahim.name/rulings")
     canvas.drawText(t)
@@ -189,7 +190,7 @@ def main(opts, args):
         # draw_radial_width_markers(c, center, opts.nib_width)
         draw_circles(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, center)
 
-    write_title_and_credits(c, opts.title, opts.nib_width, opts.partitions, opts.angles, opts.radial)
+    write_title_and_credits(c, opts.title, opts.nib_width, opts.partitions, opts.angles, pagesize, opts.radial)
 
     c.showPage()
     c.save()
