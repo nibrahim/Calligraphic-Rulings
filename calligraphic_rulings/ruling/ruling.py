@@ -175,7 +175,12 @@ Angle markings for angles (in degrees) : %s
 opts.partitions, opts.gap, opts.top_margin, opts.angles or "No angle markings")
 
 def main(opts, args):
+    if opts.landscape and opts.radial:
+        print "Ignoring radial for landscape mode"
+        opts.radial = False
     pagesize = page_sizes[opts.pagesize]
+    if opts.landscape:
+        pagesize = pagesize[1], pagesize[0]
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = pagesize, cropMarks = True)
     c.setAuthor("ruling.py version %s"%__VERSION__)
     c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
@@ -214,6 +219,8 @@ def parse_options(args):
                       help = "A title for this ruling (usually the font name)")
     parser.add_option("-r", "--radial", dest = 'radial', action="store_true", default = False,
                       help = "Draw circles instead of straight lines")
+    parser.add_option("-l", "--landscape", dest = 'landscape', action="store_true", default = False,
+                      help = "Create landscape instead of the default portrait sheet")
     parser.add_option("-s", "--pagesize", dest = 'pagesize', default = "A4",
                       help = "Size of sheet")
 
