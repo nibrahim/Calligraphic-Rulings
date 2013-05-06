@@ -34,9 +34,19 @@
     
     <label for="title">Title (Title for this sheet)</label>
     <input id="title" type="text" name="title" required value="ruling"/> 
+
+    <label for="pagesize">Page size</label>
+    <select id="title" name="pagesize" required>
+      <option value="A4">A4</option>
+      <option value="A3">A3</option>
+    </select>
+
+    <label for="landscape">Landscape (Check if you want landscape rather than portrait orientation)</label>
+    <input id="landscape" type="checkbox" name="landscape" />
     
     <label for="radial">Radial (Check if you want a radial rather than a linear sheet)</label>
     <input id="radial" type="checkbox" name="radial" /> 
+
     <br/>
     <input type="submit" name="generate" value="generate"/>
 
@@ -62,10 +72,14 @@
       <dd>You can specify a comma separated list of numbers here and the sheet will have lines drawn at these angles. Useful for people like me who need a guide to hold their nibs properly. It's also useful for some scripts like the Italic hand where the text needs a slight inclination.</dd>
       <dt>Title</dt>
       <dd>You can type something here and it will appear in bold on the right of your sheet. I usually put the nib names here so that I can pick things out easily.</dd>
-      <dt>Radial</dt>
-      <dd>This is an experimental feature. If you select this, the program will generate a concentric circles with the above specifications rather than parallel lines. This is useful to write circular text. This is a work in progress so feedback is welcome.</dd>
+      <dt>Page size (experimental)</dt>
+      <dd>This allows you set the page sizes. The default is A4. A3 is the other available option.</dd>
+      <dt>Landscape (experimental)</dt>
+      <dd>This allows you to change the layout to a landscape (rather than the default portrait)</dd>
+      <dt>Radial (experimental)</dt>
+      <dd>If you select this, the program will generate a concentric circles with the above specifications rather than parallel lines. This is useful to write circular text. This is a work in progress so feedback is welcome.</dd>
     </dl>
-    The script will also draw a nib ladder on either side of the paper for you to double check. It is currently limited to only A4 sheets.
+    The script will also draw a nib ladder on either side of the paper for you to double check. 
 
     The diagram below indicates what the various fields control. 
 

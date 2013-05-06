@@ -29,7 +29,9 @@ def pdf():
                   ('title', str),
                   ('radial', bool),
                   ('rulings', int),
-                  ('distance', int)]:
+                  ('distance', int),
+                  ('landscape', bool),
+                  ('pagesize', str)]:
         print i, "   ", request.args.get(i,'')
         setattr(cfg, i, typ(request.args.get(i,'')))
     fname = request.args.get('title','rulings').replace(" ","_").lower() + ".pdf"
