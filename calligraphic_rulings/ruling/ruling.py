@@ -72,9 +72,7 @@ def draw_circle_set(canvas, x, y, radius, nib_width, partitions):
     offset = radius
     for i in (float(x) for x in partitions.split(",")):
         canvas.circle(x, y, offset, fill = 1)
-        print " ", offset,
         offset -= i *nib_width * mm
-        print "->", offset
 
     return offset
 
@@ -86,12 +84,10 @@ def draw_circles(canvas, nib_width, partitions, gap, nrulings, top_margin, cente
     offset = nrulings * partition_radius * nib_width * mm
     
     for i in range(nrulings, 1, -1):
-        print offset,"->",
         # Draw gap
         canvas.setFillColorRGB(0, 0, 0, 1)
         canvas.circle(center[0], center[1], offset, fill = 1, stroke = 1)
         offset -= gap *nib_width * mm
-        print offset
         # Draw partitions
         canvas.setFillColorRGB(1, 1, 1, 1)
         offset = draw_circle_set(canvas, center[0], center[1], offset, nib_width, partitions)
@@ -178,7 +174,6 @@ Angle markings for angles (in degrees) : %s
 opts.partitions, opts.gap, opts.top_margin, opts.angles or "No angle markings")
 
 def main(opts, args):
-    print status_message(opts, args)
     pagesize = page_sizes[opts.pagesize]
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = pagesize, cropMarks = True)
     c.setAuthor("ruling.py version %s"%__VERSION__)
