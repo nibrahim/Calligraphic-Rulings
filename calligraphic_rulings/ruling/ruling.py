@@ -152,7 +152,7 @@ def write_title_and_credits(canvas, text, nib_width, partitions, angles, pagesiz
     t.setFont("Times-Roman", 10)
     t.textOut(" Generated using ")
     t.setFont("Times-Italic", 10)
-    t.textOut("http://noufalibrahim.name/rulings")
+    t.textOut("http://calligraffiti.in/rulings")
     canvas.drawText(t)
 
 
