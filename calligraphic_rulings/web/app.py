@@ -31,8 +31,11 @@ def pdf():
                   ('rulings', int),
                   ('distance', int),
                   ('landscape', bool),
-                  ('pagesize', str)]:
-        print i, "   ", request.args.get(i,'')
+                  ('pagesize', str),
+                  ('strokewidth', float),
+                  ('grey', bool),
+                  ('cleargap', bool)]:
+        # print (i, "   ", request.args.get(i,''))
         setattr(cfg, i, typ(request.args.get(i,'')))
     fname = request.args.get('title','rulings').replace(" ","_").lower() + ".pdf"
     s = StringIO.StringIO()

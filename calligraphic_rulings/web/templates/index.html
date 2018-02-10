@@ -12,7 +12,7 @@
     <h2> Generator</h2>
   <form action="{{ url_for('pdf') }}" method="get">
     <label for="nib_width">Nib width in mm (All other measurements are in multiples of this) </label>  
-    <input id="nib_width" type="text" name="nib_width" required/> 
+    <input id="nib_width" type="number" step="any" name="nib_width" required/> 
   
     <label for="partitions">Partitions (Comma separated list of partitions)</label>
     <input id="partitions" type="text" name="partitions" required/>
@@ -26,6 +26,11 @@
     <label for="rulings">Number of rulings (Number of rulings)</label>    
     <input id="rulings" type="number" name="rulings" value="10" required/> 
     
+    <div class="new">
+      <label for="strokewidth">Width (in mm) of strokes (Width of lines used to draw everything)</label>    
+      <input id="strokewidth" step="any" type="number" name="strokewidth" value="1" required/> 
+    </div>
+
     <label for="angles">Angle guides (Comma separated list of angle guides in degrees)</label>
     <input id="angles" type="text" name="angles" /> 
 
@@ -43,6 +48,16 @@
 
     <label for="landscape">Landscape (Check if you want landscape rather than portrait orientation)</label>
     <input id="landscape" type="checkbox" name="landscape" />
+
+    <div class="new">
+      <label for="grey">Grey guidelines (Use a light grey rather than black for angle guides)</label>
+      <input id="grey" type="checkbox" name="grey" /> 
+    </div>
+
+    <div class="new">
+      <label for="cleargap">Clear interline gaps (Don't darken the gaps between lines. Just keep them solid white)</label>
+      <input id="cleargap" type="checkbox" name="cleargap" /> 
+    </div>
     
     <label for="radial">Radial (Check if you want a radial rather than a linear sheet)</label>
     <input id="radial" type="checkbox" name="radial" /> 

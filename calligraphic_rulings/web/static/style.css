@@ -51,4 +51,20 @@ footer {
          margin-top: 20pt;
  }
 
+div.new:after {
+    color: #ff0000;
+    content: "New!";
+    font-weight: bold;
+    background-color: #ffff00;
+    border: 1px solid #ff0000;
+    margin: 3pt;
+    padding: 1pt;
+}
 
+div.new {
+    background-color: #ffff0011;
+    border: 1px solid #ff000022;
+    margin-bottom: 3pt;
+    border-radius: 3pt;
+    padding: 1pt;
+}
