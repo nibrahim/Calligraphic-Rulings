@@ -125,9 +125,11 @@ def draw_lines_for_angle(canvas, angle, distance, pagesize):
 
 
 
-def draw_angle_lines(canvas, angles, distance, pagesize):
+def draw_angle_lines(canvas, angles, distance, pagesize, grey):
     "Draws oblique lines to help with pen positioning and serifs"
     angles = (float(x.strip()) for x in angles.split(","))
+    if grey:
+        canvas.setStrokeColorRGB(0.7, 0.7, 0.7)
     for i in angles:
         draw_lines_for_angle(canvas, i, distance, pagesize)
         
@@ -188,7 +190,7 @@ def main(opts, args):
         draw_linear_width_markers(c, opts.nib_width, pagesize)
         draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, pagesize)
         if opts.angles:
-            draw_angle_lines(c, opts.angles, opts.distance, pagesize)
+            draw_angle_lines(c, opts.angles, opts.distance, pagesize, opts.grey)
     else:
         x, y = pagesize
         center = (x/2.0, y/2.0)
@@ -215,6 +217,8 @@ def parse_options(args):
                       help = "Comma separated list of angles (in degrees) for which to draw lines on the page (for pen angle, serifs etc.)")
     parser.add_option("-d", "--distance", dest = "distance", type = int,
                       help = "Distance (in mm) between angle guides")
+    parser.add_option("--grey", dest = "grey", action = "store_true",
+                      help = "Whether to use a light grey colour for angle guides.", default = False)
     parser.add_option("-t", "--title", dest = "title", type = "string",
                       help = "A title for this ruling (usually the font name)")
     parser.add_option("-r", "--radial", dest = 'radial', action="store_true", default = False,
