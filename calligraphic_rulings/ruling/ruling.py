@@ -186,12 +186,18 @@ def main(opts, args):
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = pagesize, cropMarks = True)
     c.setLineWidth(opts.strokewidth * mm)
     c.setAuthor("ruling.py version %s"%__VERSION__)
-    c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
     if not opts.radial:
         draw_linear_width_markers(c, opts.nib_width, pagesize)
-        draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, pagesize)
         if opts.angles:
             draw_angle_lines(c, opts.angles, opts.distance, pagesize, opts.grey)
+        if not opts.cleargap:
+            print ("False")
+            c.setFillColorRGB(0.5, 0.5, 0.5, 1)
+        else:
+            print ("True")
+            c.setFillColorRGB(1,1,1,1)
+        draw_lines(c, opts.nib_width, opts.partitions, opts.gap, opts.rulings, opts.top_margin, pagesize)
+
     else:
         x, y = pagesize
         center = (x/2.0, y/2.0)
@@ -230,6 +236,8 @@ def parse_options(args):
                       help = "Size of sheet")
     parser.add_option("--strokewidth", dest = 'strokewidth', default = 1, type = float,
                       help = "Width of all lines (in mm). Default is 1")
+    parser.add_option("--cleargap", dest = 'cleargap', default = False, action = "store_true",
+                      help = "Make the interline gaps clear rather")
 
 
     opts,args =  parser.parse_args(args)
