@@ -184,6 +184,7 @@ def main(opts, args):
     if opts.landscape:
         pagesize = pagesize[1], pagesize[0]
     c = canvas.Canvas(args[1], bottomup = 1, pagesize = pagesize, cropMarks = True)
+    c.setLineWidth(opts.strokewidth * mm)
     c.setAuthor("ruling.py version %s"%__VERSION__)
     c.setFillColorRGB(0.1, 0.1, 0.1, 0.5)
     if not opts.radial:
@@ -227,6 +228,9 @@ def parse_options(args):
                       help = "Create landscape instead of the default portrait sheet")
     parser.add_option("-s", "--pagesize", dest = 'pagesize', default = "A4",
                       help = "Size of sheet")
+    parser.add_option("--strokewidth", dest = 'strokewidth', default = 1, type = float,
+                      help = "Width of all lines (in mm). Default is 1")
+
 
     opts,args =  parser.parse_args(args)
     if len(args) != 2:
